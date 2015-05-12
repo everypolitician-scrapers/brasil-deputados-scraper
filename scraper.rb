@@ -19,8 +19,7 @@ end
 @BASE = 'http://www.camara.gov.br/internet/deputado/'
 @url_t = @BASE + 'Dep_Lista.asp?Legislatura=%d&Partido=QQ&SX=QQ&Todos=None&UF=QQ&condic=QQ&forma=lista&nome=&ordem=nome&origem=None'
 
-# (41..55).to_a.reverse.each do |term|
-(54..55).to_a.reverse.each do |term|
+(41..55).to_a.reverse.each do |term|
   url = @url_t % term
   puts "Getting #{url}"
   page = noko(url)

@@ -45,6 +45,7 @@ end
       source: dep_url,
     }
     added += 1
+    puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
   puts "  Added #{added} members pf Parliament #{term}"

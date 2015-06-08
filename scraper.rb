@@ -35,6 +35,7 @@ end
       name: dep.at_css('div#portal-mainsection h2').text.gsub('Deputado ', '').strip,
       fullname: block.xpath('.//li/strong[contains(.,"Nome civil")]/../text()').text.strip,
       party: partido.split('/')[0].strip,
+      party_id: partido.split('/')[0].strip,
       district: partido.split('/')[1].strip,
       phone: block.xpath('.//li/strong[contains(.,"Telefone")]/../text()').text.strip,
       legislaturas: block.xpath('.//li/strong[contains(.,"Legislaturas")]/../text()').text.strip,
@@ -45,9 +46,7 @@ end
     }
     added += 1
     ScraperWiki.save_sqlite([:name, :term], data)
-    # puts data
   end
   puts "  Added #{added} members pf Parliament #{term}"
-
 end
 

@@ -24,9 +24,16 @@ end
   puts "Getting #{url}"
   page = noko(url)
   added = 0
+  skipped = 0
 
   page.css('a[title="Detalhes do Deputado"]/@href').each do |deplink|
     dep_url = @BASE + deplink.text
+    existing = ScraperWiki.select('COUNT(*) as count FROM data WHERE source = ? AND term = ?', [dep_url, term])
+    if existing.first['count'] == 1
+      skipped += 1
+      next
+    end
+
     dep = noko(dep_url)
     block = dep.at_css('div.bloco')
     partido = block.xpath('.//li/strong[contains(.,"Partido")]/../text()').text.strip
@@ -48,6 +55,6 @@ end
     puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
-  puts "  Added #{added} members pf Parliament #{term}"
+  puts "  Added #{added} and skipped #{skipped} members of Parliament #{term}"
 end
 

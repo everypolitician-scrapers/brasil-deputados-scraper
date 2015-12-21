@@ -6,11 +6,11 @@ require 'nokogiri'
 require 'date'
 require 'open-uri'
 
-# require 'colorize'
-# require 'pry'
-# require 'csv'
-# require 'open-uri/cached'
-# OpenURI::Cache.cache_path = '.cache'
+require 'colorize'
+require 'pry'
+require 'csv'
+require 'open-uri/cached'
+OpenURI::Cache.cache_path = '.cache'
 
 def noko(url)
   Nokogiri::HTML(open(url).read) 
@@ -19,7 +19,8 @@ end
 @BASE = 'http://www.camara.gov.br/internet/deputado/'
 @url_t = @BASE + 'Dep_Lista.asp?Legislatura=%d&Partido=QQ&SX=QQ&Todos=None&UF=QQ&condic=QQ&forma=lista&nome=&ordem=nome&origem=None'
 
-(41..55).to_a.reverse.each do |term|
+# (41..55).to_a.reverse.each do |term|
+(55..55).to_a.reverse.each do |term|
   url = @url_t % term
   puts "Getting #{url}"
   page = noko(url)
@@ -28,10 +29,15 @@ end
 
   page.css('a[title="Detalhes do Deputado"]/@href').each do |deplink|
     dep_url = @BASE + deplink.text
-    existing = ScraperWiki.select('COUNT(*) as count FROM data WHERE source = ? AND term = ?', [dep_url, term])
-    if existing.first['count'] == 1
-      skipped += 1
-      next
+
+    begin
+      existing = ScraperWiki.select('COUNT(*) as count FROM data WHERE source = ? AND term = ?', [dep_url, term])
+      if existing.first['count'] == 1
+        skipped += 1
+        next
+      end
+    rescue => e
+      warn e
     end
 
     dep = noko(dep_url)
@@ -39,7 +45,7 @@ end
     partido = block.xpath('.//li/strong[contains(.,"Partido")]/../text()').text.strip
     data = { 
       id: deplink.text[/id=(\d+)/, 1],
-      name: dep.at_css('div#portal-mainsection h2').text.gsub('Deputado ', '').strip,
+      name: dep.at_css('div#portal-mainsection h2').text.gsub(/Deputad[ao] /, '').strip,
       fullname: block.xpath('.//li/strong[contains(.,"Nome civil")]/../text()').text.strip,
       party: partido.split('/')[0].strip,
       party_id: partido.split('/')[0].strip,
@@ -52,7 +58,6 @@ end
       source: dep_url,
     }
     added += 1
-    puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
   puts "  Added #{added} and skipped #{skipped} members of Parliament #{term}"

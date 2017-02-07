@@ -31,7 +31,6 @@ ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
     dep_url = @BASE + deplink.text
     dep = noko(dep_url)
 
-    binding.pry if dep_url.include? '189171'
     block = dep.at_css('div.bloco')
     partido = block.xpath('.//li/strong[contains(.,"Partido")]/../text()').text.tidy
     data = {
@@ -50,7 +49,6 @@ ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
       source:       dep_url,
     }
     added += 1
-    warn data[:birth_date]
     ScraperWiki.save_sqlite(%i(name term), data)
   end
   puts "  Added #{added} and skipped #{skipped} members of Parliament #{term}"

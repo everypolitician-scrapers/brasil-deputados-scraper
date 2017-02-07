@@ -1,18 +1,16 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require 'scraperwiki'
 require 'nokogiri'
-require 'date'
 require 'open-uri'
-
-require 'colorize'
 require 'pry'
-require 'csv'
+require 'scraperwiki'
+
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
 
 def noko(url)
+  warn url
   Nokogiri::HTML(open(url).read) 
 end
 
@@ -29,18 +27,9 @@ end
 
   page.css('a[title="Detalhes do Deputado"]/@href').each do |deplink|
     dep_url = @BASE + deplink.text
-
-    begin
-      existing = ScraperWiki.select('COUNT(*) as count FROM data WHERE source = ? AND term = ?', [dep_url, term])
-      if existing.first['count'] == 1
-        skipped += 1
-        next
-      end
-    rescue => e
-      warn e
-    end
-
     dep = noko(dep_url)
+
+    binding.pry if dep_url.include? '189171'
     block = dep.at_css('div.bloco')
     partido = block.xpath('.//li/strong[contains(.,"Partido")]/../text()').text.strip
     data = { 
@@ -50,6 +39,7 @@ end
       party: partido.split('/')[0].strip,
       party_id: partido.split('/')[0].strip,
       district: partido.split('/')[1].strip,
+      birth_date: dep.xpath('//span[contains(.,"Nascimento:")]//following-sibling::strong').text.strip,
       phone: block.xpath('.//li/strong[contains(.,"Telefone")]/../text()').text.strip,
       legislaturas: block.xpath('.//li/strong[contains(.,"Legislaturas")]/../text()').text.strip,
       image: block.xpath('.//img[contains(@src, "deputado")]/@src').text,
@@ -58,6 +48,7 @@ end
       source: dep_url,
     }
     added += 1
+    warn data[:birth_date]
     ScraperWiki.save_sqlite([:name, :term], data)
   end
   puts "  Added #{added} and skipped #{skipped} members of Parliament #{term}"

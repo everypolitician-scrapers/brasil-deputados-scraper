@@ -24,8 +24,6 @@ ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
   url = @url_t % term
   puts "Getting #{url}"
   page = noko(url)
-  added = 0
-  skipped = 0
 
   page.css('a[title="Detalhes do Deputado"]/@href').each do |deplink|
     dep_url = @BASE + deplink.text
@@ -48,8 +46,7 @@ ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
       term:         term,
       source:       dep_url,
     }
-    added += 1
+    puts data.reject { |_, v| v.to_s.empty? }.sort_by { |k, _| k }.to_h if ENV['MORPH_DEBUG']
     ScraperWiki.save_sqlite(%i[name term], data)
   end
-  puts "  Added #{added} and skipped #{skipped} members of Parliament #{term}"
 end

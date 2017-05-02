@@ -49,7 +49,7 @@ ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
       source:       dep_url,
     }
     added += 1
-    ScraperWiki.save_sqlite(%i(name term), data)
+    ScraperWiki.save_sqlite(%i[name term], data)
   end
   puts "  Added #{added} and skipped #{skipped} members of Parliament #{term}"
 end

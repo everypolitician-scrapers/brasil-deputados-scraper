@@ -10,7 +10,6 @@ require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
 
 def noko(url)
-  warn url
   Nokogiri::HTML(open(url).read)
 end
 

@@ -13,8 +13,8 @@ def noko(url)
   Nokogiri::HTML(open(url).read)
 end
 
-@BASE = 'http://www.camara.gov.br/internet/deputado/'
-@url_t = @BASE + 'Dep_Lista.asp?Legislatura=%d&Partido=QQ&SX=QQ&Todos=None&UF=QQ&condic=QQ&forma=lista&nome=&ordem=nome&origem=None'
+BASE = 'http://www.camara.gov.br/internet/deputado/'
+@url_t = BASE + 'Dep_Lista.asp?Legislatura=%d&Partido=QQ&SX=QQ&Todos=None&UF=QQ&condic=QQ&forma=lista&nome=&ordem=nome&origem=None'
 
 ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
 
@@ -24,7 +24,7 @@ ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
   page = noko(url)
 
   page.css('a[title="Detalhes do Deputado"]/@href').each do |deplink|
-    dep_url = @BASE + deplink.text
+    dep_url = BASE + deplink.text
     dep = noko(dep_url)
 
     block = dep.at_css('div.bloco')

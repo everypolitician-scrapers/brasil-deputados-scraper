@@ -21,7 +21,6 @@ ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
 # (41..55).to_a.reverse.each do |term|
 (55..55).to_a.reverse.each do |term|
   url = @url_t % term
-  puts "Getting #{url}"
   page = noko(url)
 
   page.css('a[title="Detalhes do Deputado"]/@href').each do |deplink|

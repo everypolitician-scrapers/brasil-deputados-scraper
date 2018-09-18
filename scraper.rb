@@ -27,7 +27,7 @@ ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
     dep_url = BASE + deplink.text
     dep = noko(dep_url)
 
-    block = dep.at_css('div.bloco')
+    block = dep.at_css('div.bloco') or next
     partido = block.xpath('.//li/strong[contains(.,"Partido")]/../text()').text.tidy
     data = {
       id:           deplink.text[/id=(\d+)/, 1],
